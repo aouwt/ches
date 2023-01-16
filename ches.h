@@ -30,17 +30,45 @@
 	
 	
 	typedef unsigned short Piece;
-	typedef Move (*AlgoFunc) (AlgoCtx *ctx, )
+	typedef short          Location;
+	
+	typedef bool (*AlgoInitFunc) (AlgoCtx *ctx);
+	typedef Move (*AlgoFunc)     (AlgoCtx *ctx);
+	
+	struct _Move {
+		Piece    what;
+		Location where;
+		Location from;
+	};
 	
 	struct _Board {
 		Piece p [8] [8];
 	};
 	
 	struct _AlgoCtx {
-		Board b;
+		AlgoInitFunc deinit;
+		AlgoFunc     run;
+		const char  *name;
 		
+		Board        board;
+		void        *dat;
+		ChesCtx     *ctx;
+	};
+	
+	struct _ChesCtx {
+		Board   board;
+		Move   *history;
+		AlgoCtx black;
+		AlgoCtx white;
 	};
 	
 	
-	void NewBoard ()
+	void   Ches_New  (ChesCtx *ctx);
+	void   Ches_Step (ChesCtx *ctx);
+	
+	bool   Algo_CheckMove (AlgoCtx *ctx, Move move);
+	size_t Algo_GetMoves  (AlgoCtx *ctx, Move *moves, size_t max_moves);
+	size_t Algo_GetMovesM (AlgoCtx *ctx, Move *moves);
+	void   Algo_Log       (AlgoCtx *ctx, const char *str);
+	void   Algo_LogF      (AlgoCtx *ctx, const char *fmt, ...);
 #endif
