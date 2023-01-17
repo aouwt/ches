@@ -29,6 +29,12 @@
 	#define PIECE_BLACK_QUEEN  (PIECE_BLACK | PIECE_QUEEN)
 	
 	
+	#define LOCATION_MASK_X 070
+	#define LOCATION_MASK_Y 007
+	
+	#define LOCATION_X(l) ((l & LOCATION_MASK_X) >> 3)
+	#define LOCATION_Y(l) (l & LOCATION_MASK_Y)
+	
 	typedef unsigned short Piece;
 	typedef short          Location;
 	
@@ -36,13 +42,11 @@
 	typedef Move (*AlgoFunc)     (AlgoCtx *ctx);
 	
 	struct _Move {
-		Piece    what;
-		Location where;
-		Location from;
+		Location from, to;
 	};
 	
 	struct _Board {
-		Piece p [8] [8];
+		Piece p [8 * 8];
 	};
 	
 	struct _AlgoCtx {
