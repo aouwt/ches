@@ -32,8 +32,10 @@
 	#define LOCATION_MASK_X 070
 	#define LOCATION_MASK_Y 007
 	
-	#define LOCATION_X(l) ((l & LOCATION_MASK_X) >> 3)
-	#define LOCATION_Y(l) (l & LOCATION_MASK_Y)
+	#define LOCATION_X(l) (((l) & LOCATION_MASK_X) >> 3)
+	#define LOCATION_Y(l) ((l) & LOCATION_MASK_Y)
+	
+	#define LOCATION(x,y) ((((x) & 007) << 3) | ((y) & 007))
 	
 	typedef unsigned short Piece;
 	typedef short          Location;
@@ -61,9 +63,15 @@
 	
 	struct _ChesCtx {
 		Board   board;
+		
 		Move   *history;
+		size_t  history_len;
+		size_t  history_alloc;
+		
 		AlgoCtx black;
 		AlgoCtx white;
+		
+		Piece   next_turn;
 	};
 	
 	
