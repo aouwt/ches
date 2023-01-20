@@ -1,3 +1,5 @@
+
+
 bool Ches_Step (ChesCtx *ctx) {
 	Move m;
 	AlgoCtx    *actx = ctx->next_turn == PIECE_WHITE ? &ctx->white : &ctx->black;
@@ -50,6 +52,67 @@ bool tramples (AlgoCtx *ctx, Move move) {
 	return false;
 }
 
+size_t Algo_GetAllPieces (AlgoCtx *ctx, Location *places, Pieces *pieces, size_t max_locations) {
+	size_t out = 0;
+	
+	for (int y = 0; y != 8; y ++) {
+		for (int x = 0; x != 8; x ++) {
+		
+			if (ctx->board [LOCATION (x, y)] & PIECE_MASK_COLOR == PIECE_WHITE) {
+				if (places != NULL)
+					places [out] = LOCATION (x, y);
+					
+				if (pieces != NULL)
+					pieces [out] = ctx->board [LOCATION (x, y)];
+					
+				if (++ out == max_locations)
+					return out - 1;
+			}
+			
+		}
+	}
+	
+	return out - 1;
+}
+
+// we dont really optimize this because Algo_CheckMove () does everything now, so modifying a piece's code is easy
+
+size_t Algo_GetMoves (AlgoCtx *ctx, Move *moves, size_t max_moves) {
+	#define M(dx,dy) {\
+		Move m;\
+		m.from = places [i];\
+		m.to = LOCATION (dx + LOCATION_X (places [i]), dy + LOCATION_Y (places [y]));\
+		if (Algo_CheckMove (ctx, m)) {\
+			moves [out ++] = m;\
+			if (out == max_moves)\
+				return out - 1;\
+		}\
+	}
+	
+	Pieces   pieces [8 * 8];
+	Location places [8 * 8];
+	
+	size_t count = Algo_GetAllPieces (ctx, places, pieces, 8 * 8);
+	for (size_t i = 0; i != count; i ++) {
+		for (int y = 0; y != 8; y ++) {
+			for (int x = 0; x != 8; x ++) {
+			
+			Move m;
+			m.from = places [i];
+			m.to = LOCATION (x, y);
+			
+			if (Algo_CheckMove (ctx, m)) {
+				moves [out ++] = m;
+				if (out == max_moves)
+					return out - 1;
+			}
+		}
+	}
+	
+	return out - 1;
+	#undef M
+}
+
 bool Algo_CheckMove (AlgoCtx *ctx, Move move) {
 	#define C(b) \
 		if (!(b))\
@@ -83,21 +146,27 @@ bool Algo_CheckMove (AlgoCtx *ctx, Move move) {
 				(abs (dx) == 3 && abs (dy) == 1)
 			);
 		break;
+		
 		case PIECE_BISHOP:
 			C (abs (dx) == abs (dy));
+			C (! tramples (ctx, move));
 		break;
 		
 		case PIECE_KING:
 			C (abs (dx) == 1 || abs (dy) == 1);
+		break;
+		
 		case PIECE_QUEEN:
 			C (
 				abs (dx) == abs (dy) ||
 				abs (dx) == 0 ||
 				abs (dy) == 0
 			);
+			C (! tramples (ctx, move));
 		break;
 		
 		default:
 			return false;
 	}
+	#undef C
 }

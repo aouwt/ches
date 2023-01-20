@@ -78,9 +78,9 @@
 	void   Ches_New  (ChesCtx *ctx);
 	void   Ches_Step (ChesCtx *ctx);
 	
-	bool   Algo_CheckMove (AlgoCtx *ctx, Move move);
-	size_t Algo_GetMoves  (AlgoCtx *ctx, Move *moves, size_t max_moves);
-	size_t Algo_GetMovesM (AlgoCtx *ctx, Move *moves);
-	void   Algo_Log       (AlgoCtx *ctx, const char *str);
-	void   Algo_LogF      (AlgoCtx *ctx, const char *fmt, ...);
+	bool   Algo_CheckMove    (AlgoCtx *ctx, Move move);
+	size_t Algo_GetMoves     (AlgoCtx *ctx, Move *moves, size_t max_moves);
+	size_t Algo_GetAllPieces (AlgoCtx *ctx, Location *places, Piece *pieces, size_t max_locations);
+	void   Algo_Log          (AlgoCtx *ctx, const char *str);
+	void   Algo_LogF         (AlgoCtx *ctx, const char *fmt, ...);
 #endif
